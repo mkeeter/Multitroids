@@ -2,9 +2,7 @@ import sf
 from keyboard import Keyboard
 from virtual_keyboard import VirtualKeyboard
 from mouse import Mouse
-from bot import Bot
-from blob import Blob
-from tile_map import TileMap
+from ship import Ship
 from toggle import Toggle
 
 class GameManager(object):
@@ -15,50 +13,24 @@ class GameManager(object):
 
         # Initialize the window
         self.window = sf.RenderWindow(sf.VideoMode(800, 600),\
-                                      "Time & Time Again")
+                                      "Swarm")
         self.window.framerate_limit = 60
         self.view_size = sf.Vector2f(32 * 12, 32 * 9)
-        self.window.view = sf.View.from_rect(sf.FloatRect(0, 0,
-                                                          self.view_size.x,
-                                                          self.view_size.y))
+        self.window.view = sf.View.from_center_and_size(sf.Vector2f(),
+                                                        self.view_size)        
         # Initialize real and virtual keyboards.
         self.keyboard = Keyboard()
         self.virtual_keyboards = []
         self.mouse = Mouse()
         
-        # Initialize everything else
-        self.tile_map = TileMap('basic')
-        self.players = [Bot(self.keyboard, self.tile_map.start_loc)]
-        self.bullets = []
-
+        self.player = Ship(self.keyboard)
+        
         self.DEBUG = Toggle(source = self.keyboard[sf.Key.NUM0],
                             initVal = False)
 
         # Start the system running
         self.running = Toggle(initVal = True,\
                               source = self.keyboard[sf.Key.ESCAPE])
-
-################################################################################
-
-    def start_again(self):
-        # Save a new virtual keyboard.
-        self.virtual_keyboards += [VirtualKeyboard(self.keyboard)]
-        
-        # Switch over the last bot to running on the virtual keyboard.
-        self.players[-1].reset(self.virtual_keyboards[-1],
-                               self.tile_map.start_loc)
-        
-        self.players += [Bot(self.keyboard)]
-        
-        # Reset all of the keyboards, real and virtual.
-        for vkb in self.virtual_keyboards:
-            vkb.reset()
-        self.keyboard.reset()
-        
-        # Reset player locations
-        for player in self.players:
-            player.reset(None, self.tile_map.start_loc)
-        self.players[-1].is_clone = False
             
         
 ################################################################################
@@ -72,8 +44,8 @@ class GameManager(object):
                 self.running = False
 
             elif event.type == sf.Event.KEY_PRESSED:
-                if event.code == sf.Key.R:
-                    self.start_again()
+#                if event.code == sf.Key.R:
+#                    self.start_again()
                 # Pass the key into the keyboard data handler.
                 self.keyboard.down(event.code)
                 
@@ -107,16 +79,7 @@ class GameManager(object):
 ################################################################################
     
     def update(self):
-        [bullet.update(self) for bullet in self.bullets]
-
-        for player in self.players:
-            bullet = player.update(self)
-            if  bullet:
-                self.bullets += [bullet]
-
-        self.keyboard.increment()
-        for vkb in self.virtual_keyboards:
-            vkb.increment()
+        self.player.update()
 
 ################################################################################
     
@@ -140,17 +103,12 @@ class GameManager(object):
 ################################################################################
     
     def draw(self):
-        view = sf.View.from_center_and_size(self.players[-1].get_center(),\
-                                            self.view_size)
-        view = self.tile_map.bound_view(view)
+        view = sf.View.from_center_and_size(self.player.loc, self.view_size)
         self.window.view = view
-        self.tile_map.draw(self.window)
-
-        [player.draw(self.window, debug = self.DEBUG) for player in self.players]
+        self.player.draw(self.window)
         
-        [bullet.draw(self.window) for bullet in self.bullets]
-        self.window.view = sf.View.from_center_and_size(self.view_size / 2.0,\
-                                                        self.view_size)
+        view = sf.View.from_center_and_size(self.view_size / 2., self.view_size)        
+        self.window.view = view
         self.draw_FPS()
 
 ################################################################################
