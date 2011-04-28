@@ -24,8 +24,8 @@ class Ship(object):
             self.ang_vel = 0
         
         if self.THRUST:
-            direction = sf.Vector2f(sin(radians(self.angle)),
-                                    -cos(radians(self.angle)))
+            direction = sf.Vector2f(-sin(radians(self.angle)),
+                                    cos(radians(self.angle)))
             self.momentum += 0.1 * direction
             speed = pow(self.momentum.x, 2) + pow(self.momentum.y, 2)
             if speed > 5:
@@ -39,28 +39,22 @@ class Ship(object):
     def draw(self, window):
         if self.THRUST:
             thrustshape = sf.Shape()
-            thrustshape.add_point(self.loc.x - 3, self.loc.y - 5,
-                            sf.Color.BLACK, sf.Color.RED)
-            thrustshape.add_point(self.loc.x + 3, self.loc.y - 5,
-                            sf.Color.BLACK, sf.Color.RED)
-            thrustshape.add_point(self.loc.x, self.loc.y - 10,
-                            sf.Color.BLACK, sf.Color.RED)
+            thrustshape.add_point(-3, -5, sf.Color.BLACK, sf.Color.RED)
+            thrustshape.add_point(3, -5, sf.Color.BLACK, sf.Color.RED)
+            thrustshape.add_point(0, -10, sf.Color.BLACK, sf.Color.RED)
             thrustshape.outline_thickness = 1
             thrustshape.outline_enabled = True
-            thrustshape.origin = self.loc
+            thrustshape.position = self.loc
             thrustshape.rotate(self.angle)
             window.draw(thrustshape)
     
         shipshape = sf.Shape()
-        shipshape.add_point(self.loc.x - 5, self.loc.y - 5,
-                        sf.Color.BLACK, sf.Color.WHITE)
-        shipshape.add_point(self.loc.x + 5, self.loc.y - 5,
-                        sf.Color.BLACK, sf.Color.WHITE)
-        shipshape.add_point(self.loc.x, self.loc.y + 10,
-                        sf.Color.BLACK, sf.Color.WHITE)
+        shipshape.add_point(-5, -5, sf.Color.BLACK, sf.Color.WHITE)
+        shipshape.add_point(5,  -5, sf.Color.BLACK, sf.Color.WHITE)
+        shipshape.add_point(0, 10, sf.Color.BLACK, sf.Color.WHITE)
         shipshape.outline_thickness = 1
         shipshape.outline_enabled = True
-        shipshape.origin = self.loc
+        shipshape.position = self.loc
         shipshape.rotate(self.angle)
         window.draw(shipshape)
         

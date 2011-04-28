@@ -71,9 +71,7 @@ class GameManager(object):
         while self.running:
             self.handle_events()
             self.update()
-            self.window.clear()
             self.draw()
-            self.window.display()
         self.shutdown()
 
 ################################################################################
@@ -103,13 +101,40 @@ class GameManager(object):
 ################################################################################
     
     def draw(self):
-        view = sf.View.from_center_and_size(self.player.loc, self.view_size)
-        self.window.view = view
+        self.window.clear()
+        
+        self.window.view = sf.View.from_center_and_size(self.view_size / 2.,
+                                                        self.view_size)        
+        self.draw_FPS()
+        
+        self.window.view = sf.View.from_center_and_size(self.player.loc,
+                                                        self.view_size)
+        self.drawGrid()
         self.player.draw(self.window)
         
-        view = sf.View.from_center_and_size(self.view_size / 2., self.view_size)        
-        self.window.view = view
-        self.draw_FPS()
+        self.window.display()
+
+################################################################################
+
+    def drawGrid(self):
+        center = self.window.view.center
+        size = self.window.view.size
+        
+        stepSize = 50
+        
+        startX = int(center[0] - size[0]) - int(center[0] - size[0]) % stepSize
+        endX =   int(center[0] + size[0]) - int(center[0] + size[0]) % stepSize
+        startY = int(center[1] - size[1]) - int(center[1] - size[1]) % stepSize
+        endY =   int(center[1] + size[1]) - int(center[1] + size[1]) % stepSize
+
+        color = sf.Color(120, 120, 120)
+        
+        for i in range(startX, endX, stepSize):
+            for j in range(startY, endY, stepSize):
+                circ = sf.Shape.circle(i, j, 2, color)
+                self.window.draw(circ)
+        circ = sf.Shape.circle(0, 0, 5, sf.Color.BLUE)
+        self.window.draw(circ)
 
 ################################################################################
 
