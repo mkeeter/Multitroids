@@ -12,6 +12,9 @@ class Bullet(object):
     def update(self, mgr = None):
         self.loc += self.momentum
         # Bound location within window.
+        if not mgr:
+            return
+            
         if self.loc.x > mgr.view_size.x:
             self.loc.x -= mgr.view_size.x
         if self.loc.x < 0:

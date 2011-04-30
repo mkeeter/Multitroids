@@ -4,6 +4,7 @@ from virtual_keyboard import VirtualKeyboard
 from mouse import Mouse
 from ship import Ship
 from toggle import Toggle
+from asteroid import Asteroid
 
 class GameManager(object):
     """The game manager class handles the entire game system."""
@@ -23,8 +24,10 @@ class GameManager(object):
         self.virtual_keyboards = []
         self.mouse = Mouse()
         
+        # Initialize game objects
         self.player = Ship(self.keyboard, self.view_size / 2.0)
         self.bullets = []
+        self.asteroids = [Asteroid(self) for i in range(30)]
         
         self.DEBUG = Toggle(source = self.keyboard[sf.Key.NUM0],
                             initVal = False)
@@ -83,6 +86,7 @@ class GameManager(object):
             self.bullets += [bullet]
         [bullet.update(self) for bullet in self.bullets]
         self.bullets = filter(lambda x: x.alive(), self.bullets)
+        [asteroid.update(self) for asteroid in self.asteroids]
 
 ################################################################################
     
@@ -114,6 +118,7 @@ class GameManager(object):
         
         self.player.draw(self.window)
         [bullet.draw(self.window) for bullet in self.bullets]
+        [asteroid.draw(self.window) for asteroid in self.asteroids]        
         
         self.window.display()
 

@@ -39,14 +39,15 @@ class Ship(object):
         self.loc += self.momentum
         
         # Bound location within window.
-        if self.loc.x > mgr.view_size.x:
-            self.loc.x -= mgr.view_size.x
-        if self.loc.x < 0:
-            self.loc.x += mgr.view_size.x
-        if self.loc.y > mgr.view_size.y:
-            self.loc.y -= mgr.view_size.y
-        if self.loc.y < 0:
-            self.loc.y += mgr.view_size.y
+        if mgr:
+            if self.loc.x > mgr.view_size.x:
+                self.loc.x -= mgr.view_size.x
+            if self.loc.x < 0:
+                self.loc.x += mgr.view_size.x
+            if self.loc.y > mgr.view_size.y:
+                self.loc.y -= mgr.view_size.y
+            if self.loc.y < 0:
+                self.loc.y += mgr.view_size.y
         
         if self.SHOOT and not self.shootHeld:
             self.shootHeld = True
