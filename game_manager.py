@@ -29,9 +29,10 @@ class GameManager(object):
         self.players = [Ship(self.keyboard, self.view_size / 2.0)]
         self.bullets = []
         self.rand_state = random.getstate()
+        self.num_asteroids = 5
         self.asteroids = [Asteroid(self, clear_zone = self.view_size / 2.0,
                                    seed = random.random())
-                          for i in range(0)]
+                          for i in range(self.num_asteroids)]
         
         self.DEBUG = Toggle(source = self.keyboard[sf.Key.NUM0],
                             initVal = False)
@@ -66,16 +67,13 @@ class GameManager(object):
         random.setstate(self.rand_state)
         self.asteroids = [Asteroid(self, clear_zone = self.view_size / 2.0,
                                    seed = random.random())
-                          for i in range(0)]
+                          for i in range(self.num_asteroids)]
         
 ################################################################################
 
     def handle_input(self):
         """Processes the list of events, sending them to their various handlers.
         """
-        self.keyboard.increment()
-        for vkb in self.virtual_keyboards:
-            vkb.increment()
             
         for event in self.window.iter_events():
             # If the window is ever closed, stop running.
@@ -101,6 +99,10 @@ class GameManager(object):
 
             elif event.type == sf.Event.MOUSE_BUTTON_RELEASED:
                 self.mouse.up(event.button)
+                
+        self.keyboard.increment()
+        for vkb in self.virtual_keyboards:
+            vkb.increment()
                 
 ################################################################################
 
