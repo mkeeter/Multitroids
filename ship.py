@@ -22,11 +22,46 @@ class Ship(object):
                         sf.Vector2f(0, 10)]
         # Plus various other state things
         self.shootHeld = False
+        self.alive = True
+        self.is_clone = False
+        
+################################################################################        
+    def reset(self, keyboard, startLoc = sf.Vector2f(0, 0)):
+        if keyboard:
+            self.LEFT  = data_sink.DataSink(source = keyboard[sf.Key.A])
+            self.RIGHT = data_sink.DataSink(source = keyboard[sf.Key.D])
+            self.THRUST  = data_sink.DataSink(source = keyboard[sf.Key.W])
+            self.BRAKE  = data_sink.DataSink(source = keyboard[sf.Key.S])
+            self.SHOOT  = data_sink.DataSink(source = keyboard[sf.Key.SPACE])
+        self.loc = startLoc
+        self.momentum = sf.Vector2f()
+        self.angle = 0
+        self.shootHeld = False
+        self.alive = True
+        self.is_clone = True
+################################################################################
 
+    def boundLoc(self, mgr):
+        # Bound location within window.
+        if mgr:
+            if self.loc.x > mgr.view_size.x:
+                self.loc.x -= mgr.view_size.x
+            if self.loc.x < 0:
+                self.loc.x += mgr.view_size.x
+            if self.loc.y > mgr.view_size.y:
+                self.loc.y -= mgr.view_size.y
+            if self.loc.y < 0:
+                self.loc.y += mgr.view_size.y
+################################################################################
     def update(self, mgr = None):
+        if not self.alive:
+            self.loc += self.momentum
+            self.boundLoc(mgr)
+            return
+            
         for asteroid in mgr.asteroids:
             if any([asteroid.touches(c + self.loc) for c in self.corners]):
-                print "Dead!"
+                self.alive = False
     
         if self.LEFT and not self.RIGHT:
             self.angle -= 5
@@ -44,26 +79,16 @@ class Ship(object):
             self.momentum *= 0.9
             
         self.loc += self.momentum
-        
-        # Bound location within window.
-        if mgr:
-            if self.loc.x > mgr.view_size.x:
-                self.loc.x -= mgr.view_size.x
-            if self.loc.x < 0:
-                self.loc.x += mgr.view_size.x
-            if self.loc.y > mgr.view_size.y:
-                self.loc.y -= mgr.view_size.y
-            if self.loc.y < 0:
-                self.loc.y += mgr.view_size.y
+        self.boundLoc(mgr)
         
         if self.SHOOT and not self.shootHeld:
             self.shootHeld = True
             return bullet.Bullet(self.loc.copy(), self.angle)
         elif not self.SHOOT:
             self.shootHeld = False
-        
+################################################################################        
     def draw(self, window):
-        if self.THRUST:
+        if self.THRUST and self.alive:
             thrustshape = sf.Shape()
             thrustshape.add_point(-3, -5, sf.Color.BLACK, sf.Color.RED)
             thrustshape.add_point(3, -5, sf.Color.BLACK, sf.Color.RED)
@@ -76,8 +101,16 @@ class Ship(object):
             window.draw(thrustshape)
     
         shipshape = sf.Shape()
+        if self.is_clone:
+            alpha = 100
+        else:
+            alpha = 255
+        if self.alive:
+            color = sf.Color(255, 255, 255, alpha)
+        else:
+            color = sf.Color(255, 0, 0, alpha)
         for c in self.corners:
-            shipshape.add_point(c.x, c.y, sf.Color.BLACK, sf.Color.WHITE)
+            shipshape.add_point(c.x, c.y, sf.Color.BLACK, color)
         shipshape.outline_thickness = 1
         shipshape.outline_enabled = True
         shipshape.fill_enabled = False

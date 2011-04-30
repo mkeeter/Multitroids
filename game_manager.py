@@ -5,6 +5,7 @@ from mouse import Mouse
 from ship import Ship
 from toggle import Toggle
 from asteroid import Asteroid
+import random
 
 class GameManager(object):
     """The game manager class handles the entire game system."""
@@ -25,8 +26,9 @@ class GameManager(object):
         self.mouse = Mouse()
         
         # Initialize game objects
-        self.player = Ship(self.keyboard, self.view_size / 2.0)
+        self.players = [Ship(self.keyboard, self.view_size / 2.0)]
         self.bullets = []
+        self.rand_state = random.getstate()
         self.asteroids = [Asteroid(self) for i in range(5)]
         
         self.DEBUG = Toggle(source = self.keyboard[sf.Key.NUM0],
@@ -36,10 +38,35 @@ class GameManager(object):
         self.running = Toggle(initVal = True,\
                               source = self.keyboard[sf.Key.ESCAPE])
             
+
+################################################################################
+
+    def start_again(self):
+        # Save a new virtual keyboard.
+        self.virtual_keyboards += [VirtualKeyboard(self.keyboard)]
+        
+        # Switch over the last bot to running on the virtual keyboard.
+        self.players[-1].reset(self.virtual_keyboards[-1],
+                               self.view_size / 2.0)
+        
+        self.players += [Ship(self.keyboard, self.view_size / 2.0)]
+        
+        # Reset all of the keyboards, real and virtual.
+        for vkb in self.virtual_keyboards:
+            vkb.reset()
+        self.keyboard.reset()
+        
+        # Reset player locations
+        for player in self.players:
+            player.reset(None, self.view_size / 2.0)
+        self.players[-1].is_clone = False
+
+        random.setstate(self.rand_state)
+        self.asteroids = [Asteroid(self) for i in range(5)]
         
 ################################################################################
 
-    def handle_events(self):
+    def handle_input(self):
         """Processes the list of events, sending them to their various handlers.
         """
         for event in self.window.iter_events():
@@ -48,8 +75,8 @@ class GameManager(object):
                 self.running = False
 
             elif event.type == sf.Event.KEY_PRESSED:
-#                if event.code == sf.Key.R:
-#                    self.start_again()
+                if event.code == sf.Key.R:
+                    self.start_again()
                 # Pass the key into the keyboard data handler.
                 self.keyboard.down(event.code)
                 
@@ -65,6 +92,10 @@ class GameManager(object):
             elif event.type == sf.Event.MOUSE_BUTTON_RELEASED:
                 self.mouse.up(event.button)
                 
+        self.keyboard.increment()
+        for vkb in self.virtual_keyboards:
+            vkb.increment()
+                
 ################################################################################
 
     def run(self):
@@ -73,7 +104,7 @@ class GameManager(object):
         
         # Begin loop
         while self.running:
-            self.handle_events()
+            self.handle_input()
             self.update()
             self.draw()
         self.shutdown()
@@ -81,11 +112,12 @@ class GameManager(object):
 ################################################################################
     
     def update(self):
-        bullet = self.player.update(self)
-        if bullet:
-            self.bullets += [bullet]
+        for player in self.players:
+            bullet = player.update(self)
+            if bullet:
+                self.bullets += [bullet]
         [bullet.update(self) for bullet in self.bullets]
-        self.bullets = filter(lambda x: x.alive(), self.bullets)
+        self.bullets = filter(lambda x: x.alive, self.bullets)
         
         # Figure out if any new asteroids spawn
         newAsteroids = []
@@ -121,8 +153,9 @@ class GameManager(object):
         self.window.view = sf.View.from_center_and_size(self.view_size / 2.,
                                                         self.view_size)        
         self.draw_FPS()
-        
-        self.player.draw(self.window)
+
+        for player in self.players:        
+            player.draw(self.window)
         [bullet.draw(self.window) for bullet in self.bullets]
         [asteroid.draw(self.window) for asteroid in self.asteroids]        
         

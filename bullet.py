@@ -8,7 +8,8 @@ class Bullet(object):
         self.momentum = sf.Vector2f(-sin(radians(self.angle)),
                                      cos(radians(self.angle))) * speed
         self.life = 100
-
+        self.alive = True
+        
     def update(self, mgr = None):
         self.loc += self.momentum
         # Bound location within window.
@@ -24,17 +25,16 @@ class Bullet(object):
         if self.loc.y < 0:
             self.loc.y += mgr.view_size.y
         self.life -= 1
-        
+        if self.life <= 0:
+            self.alive = False
+            
         for asteroid in mgr.asteroids:
             if asteroid.touches(self.loc):
                 asteroid.alive = False
-                self.life = 0
+                self.alive = False
             
     def draw(self, window):
         line = sf.Shape.line(0, -5, 0, 5, 1, sf.Color.GREEN)
         line.position = self.loc
         line.rotation = self.angle
         window.draw(line)
-        
-    def alive(self):
-        return self.life > 0
