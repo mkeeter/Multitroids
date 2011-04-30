@@ -48,7 +48,7 @@ class GameManager(object):
 
     def start_again(self):
         # Save a new virtual keyboard.
-        self.keyboard.history += [(self.keyboard.history[-1][0], sf.Key.SPACE, 'u')]
+        self.keyboard.history += [(self.keyboard.time, sf.Key.SPACE, 'u')]
         self.virtual_keyboards += [VirtualKeyboard(self.keyboard)]
         
         # Switch over the last bot to running on the virtual keyboard.
