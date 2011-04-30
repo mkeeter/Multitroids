@@ -15,7 +15,7 @@ class GameManager(object):
         self.window = sf.RenderWindow(sf.VideoMode(800, 600),\
                                       "Swarm")
         self.window.framerate_limit = 60
-        self.view_size = sf.Vector2f(32 * 12, 32 * 9)
+        self.view_size = sf.Vector2f(800, 600)
         self.window.view = sf.View.from_center_and_size(sf.Vector2f(),
                                                         self.view_size)        
         # Initialize real and virtual keyboards.
@@ -23,7 +23,8 @@ class GameManager(object):
         self.virtual_keyboards = []
         self.mouse = Mouse()
         
-        self.player = Ship(self.keyboard)
+        self.player = Ship(self.keyboard, self.view_size / 2.0)
+        self.bullets = []
         
         self.DEBUG = Toggle(source = self.keyboard[sf.Key.NUM0],
                             initVal = False)
@@ -77,7 +78,11 @@ class GameManager(object):
 ################################################################################
     
     def update(self):
-        self.player.update()
+        bullet = self.player.update(self)
+        if bullet:
+            self.bullets += [bullet]
+        [bullet.update(self) for bullet in self.bullets]
+        self.bullets = filter(lambda x: x.alive(), self.bullets)
 
 ################################################################################
     
@@ -95,7 +100,7 @@ class GameManager(object):
             text = sf.Text("FPS: %(fps)03d" % {'fps': 1 / ft})
         else:
             text = sf.Text("FPS:inf")
-        text.scale = sf.Vector2f(0.25, 0.25)
+        text.scale = sf.Vector2f(0.5, 0.5)
         self.window.draw(text)
 
 ################################################################################
@@ -107,10 +112,8 @@ class GameManager(object):
                                                         self.view_size)        
         self.draw_FPS()
         
-        self.window.view = sf.View.from_center_and_size(self.player.loc,
-                                                        self.view_size)
-        self.drawGrid()
         self.player.draw(self.window)
+        [bullet.draw(self.window) for bullet in self.bullets]
         
         self.window.display()
 

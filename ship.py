@@ -1,31 +1,34 @@
 import data_sink
 import sf
+import bullet
 from math import sin, cos, radians
 
 class Ship(object):
     def __init__(self, keyboard, startLoc = sf.Vector2f(0, 0)):
-        # Initialize inputs
+        # Initialize inputs.
         self.LEFT  = data_sink.DataSink(source = keyboard[sf.Key.A])
         self.RIGHT = data_sink.DataSink(source = keyboard[sf.Key.D])
         self.THRUST  = data_sink.DataSink(source = keyboard[sf.Key.W])
         self.BRAKE  = data_sink.DataSink(source = keyboard[sf.Key.S])
+        self.SHOOT  = data_sink.DataSink(source = keyboard[sf.Key.SPACE])
         
-        self.loc = sf.Vector2f()
+        # And initialize movement state.
+        self.loc = startLoc
         self.momentum = sf.Vector2f()
         self.angle = 0
-        self.ang_vel = 0
+        
+        # Plus various other state things
+        self.shootHeld = False
 
-    def update(self):
+    def update(self, mgr = None):
         if self.LEFT and not self.RIGHT:
-            self.ang_vel = -5
+            self.angle -= 5
         elif self.RIGHT and not self.LEFT:
-            self.ang_vel = 5
-        else:
-            self.ang_vel = 0
+            self.angle += 5
         
         if self.THRUST:
             direction = sf.Vector2f(-sin(radians(self.angle)),
-                                    cos(radians(self.angle)))
+                                     cos(radians(self.angle)))
             self.momentum += 0.1 * direction
             speed = pow(self.momentum.x, 2) + pow(self.momentum.y, 2)
             if speed > 5:
@@ -34,7 +37,22 @@ class Ship(object):
             self.momentum *= 0.9
             
         self.loc += self.momentum
-        self.angle += self.ang_vel
+        
+        # Bound location within window.
+        if self.loc.x > mgr.view_size.x:
+            self.loc.x -= mgr.view_size.x
+        if self.loc.x < 0:
+            self.loc.x += mgr.view_size.x
+        if self.loc.y > mgr.view_size.y:
+            self.loc.y -= mgr.view_size.y
+        if self.loc.y < 0:
+            self.loc.y += mgr.view_size.y
+        
+        if self.SHOOT and not self.shootHeld:
+            self.shootHeld = True
+            return bullet.Bullet(self.loc.copy(), self.angle)
+        elif not self.SHOOT:
+            self.shootHeld = False
         
     def draw(self, window):
         if self.THRUST:
@@ -55,6 +73,6 @@ class Ship(object):
         shipshape.outline_thickness = 1
         shipshape.outline_enabled = True
         shipshape.position = self.loc
-        shipshape.rotate(self.angle)
+        shipshape.rotation = self.angle
         window.draw(shipshape)
         
