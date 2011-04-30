@@ -14,10 +14,10 @@ class GameManager(object):
         """Initialize the render window and set the game as running"""
 
         # Initialize the window
-        self.window = sf.RenderWindow(sf.VideoMode(800, 600),\
-                                      "Swarm")
+        self.window = sf.RenderWindow(sf.VideoMode(1440, 900),\
+                                      "Swarm", sf.Style.FULLSCREEN)
         self.window.framerate_limit = 60
-        self.view_size = sf.Vector2f(800, 600)
+        self.view_size = sf.Vector2f(800, 500)
         self.window.view = sf.View.from_center_and_size(sf.Vector2f(),
                                                         self.view_size)        
         # Initialize real and virtual keyboards.
@@ -36,6 +36,8 @@ class GameManager(object):
         
         self.DEBUG = Toggle(source = self.keyboard[sf.Key.NUM0],
                             initVal = False)
+
+        self.won = False
 
         # Start the system running
         self.running = Toggle(initVal = True,\
@@ -160,7 +162,9 @@ class GameManager(object):
         
         self.window.view = sf.View.from_center_and_size(self.view_size / 2.,
                                                         self.view_size)        
-        self.draw_FPS()
+
+        if self.DEBUG:
+            self.draw_FPS()
 
         for player in self.players:        
             player.draw(self.window)

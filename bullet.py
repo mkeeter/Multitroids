@@ -7,7 +7,7 @@ class Bullet(object):
         self.angle = angle
         self.momentum = sf.Vector2f(-sin(radians(self.angle)),
                                      cos(radians(self.angle))) * speed
-        self.life = 100
+        self.life = 20
         self.alive = True
         
     def update(self, mgr = None):

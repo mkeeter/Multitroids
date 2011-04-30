@@ -60,7 +60,7 @@ class Ship(object):
             return
             
         for asteroid in mgr.asteroids:
-            if any([asteroid.touches(c + self.loc) for c in self.corners]):
+            if asteroid.distance(self.loc) < 5:
                 self.alive = False
     
         if self.LEFT and not self.RIGHT:

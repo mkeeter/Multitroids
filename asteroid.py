@@ -1,5 +1,6 @@
 import sf
 import random
+from math import sqrt
 
 class Asteroid(object):
     def __init__(self, mgr = None, loc = None, size = 25,
@@ -80,6 +81,10 @@ class Asteroid(object):
                 return True
 
         return False
+        
+    def distance(self, loc):
+        dist = loc - self.loc
+        return sqrt(pow(dist.x, 2) + pow(dist.y, 2)) - self.size
         
 
     
