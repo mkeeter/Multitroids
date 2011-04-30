@@ -17,10 +17,17 @@ class Ship(object):
         self.momentum = sf.Vector2f()
         self.angle = 0
         
+        self.corners = [sf.Vector2f(-5, -5),
+                        sf.Vector2f(5, -5),
+                        sf.Vector2f(0, 10)]
         # Plus various other state things
         self.shootHeld = False
 
     def update(self, mgr = None):
+        for asteroid in mgr.asteroids:
+            if any([asteroid.touches(c + self.loc) for c in self.corners]):
+                print "Dead!"
+    
         if self.LEFT and not self.RIGHT:
             self.angle -= 5
         elif self.RIGHT and not self.LEFT:
@@ -63,16 +70,17 @@ class Ship(object):
             thrustshape.add_point(0, -10, sf.Color.BLACK, sf.Color.RED)
             thrustshape.outline_thickness = 1
             thrustshape.outline_enabled = True
+            thrustshape.fill_enabled = False
             thrustshape.position = self.loc
             thrustshape.rotate(self.angle)
             window.draw(thrustshape)
     
         shipshape = sf.Shape()
-        shipshape.add_point(-5, -5, sf.Color.BLACK, sf.Color.WHITE)
-        shipshape.add_point(5,  -5, sf.Color.BLACK, sf.Color.WHITE)
-        shipshape.add_point(0, 10, sf.Color.BLACK, sf.Color.WHITE)
+        for c in self.corners:
+            shipshape.add_point(c.x, c.y, sf.Color.BLACK, sf.Color.WHITE)
         shipshape.outline_thickness = 1
         shipshape.outline_enabled = True
+        shipshape.fill_enabled = False
         shipshape.position = self.loc
         shipshape.rotation = self.angle
         window.draw(shipshape)

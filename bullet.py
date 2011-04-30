@@ -24,6 +24,11 @@ class Bullet(object):
         if self.loc.y < 0:
             self.loc.y += mgr.view_size.y
         self.life -= 1
+        
+        for asteroid in mgr.asteroids:
+            if asteroid.touches(self.loc):
+                asteroid.alive = False
+                self.life = 0
             
     def draw(self, window):
         line = sf.Shape.line(0, -5, 0, 5, 1, sf.Color.GREEN)
@@ -32,4 +37,4 @@ class Bullet(object):
         window.draw(line)
         
     def alive(self):
-        return self.life >= 0
+        return self.life > 0

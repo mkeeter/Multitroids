@@ -27,7 +27,7 @@ class GameManager(object):
         # Initialize game objects
         self.player = Ship(self.keyboard, self.view_size / 2.0)
         self.bullets = []
-        self.asteroids = [Asteroid(self) for i in range(30)]
+        self.asteroids = [Asteroid(self) for i in range(5)]
         
         self.DEBUG = Toggle(source = self.keyboard[sf.Key.NUM0],
                             initVal = False)
@@ -86,7 +86,13 @@ class GameManager(object):
             self.bullets += [bullet]
         [bullet.update(self) for bullet in self.bullets]
         self.bullets = filter(lambda x: x.alive(), self.bullets)
-        [asteroid.update(self) for asteroid in self.asteroids]
+        
+        # Figure out if any new asteroids spawn
+        newAsteroids = []
+        for asteroid in self.asteroids:
+            newAsteroids += asteroid.update(self)
+        self.asteroids = filter(lambda x: x.alive, self.asteroids)
+        self.asteroids += newAsteroids
 
 ################################################################################
     
