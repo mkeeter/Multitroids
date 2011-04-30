@@ -29,7 +29,9 @@ class GameManager(object):
         self.players = [Ship(self.keyboard, self.view_size / 2.0)]
         self.bullets = []
         self.rand_state = random.getstate()
-        self.asteroids = [Asteroid(self) for i in range(5)]
+        self.asteroids = [Asteroid(self, clear_zone = self.view_size / 2.0,
+                                   seed = random.random())
+                          for i in range(0)]
         
         self.DEBUG = Toggle(source = self.keyboard[sf.Key.NUM0],
                             initVal = False)
@@ -62,21 +64,29 @@ class GameManager(object):
         self.players[-1].is_clone = False
 
         random.setstate(self.rand_state)
-        self.asteroids = [Asteroid(self) for i in range(5)]
+        self.asteroids = [Asteroid(self, clear_zone = self.view_size / 2.0,
+                                   seed = random.random())
+                          for i in range(0)]
         
 ################################################################################
 
     def handle_input(self):
         """Processes the list of events, sending them to their various handlers.
         """
+        self.keyboard.increment()
+        for vkb in self.virtual_keyboards:
+            vkb.increment()
+            
         for event in self.window.iter_events():
             # If the window is ever closed, stop running.
             if event.type == sf.Event.CLOSED:
                 self.running = False
 
             elif event.type == sf.Event.KEY_PRESSED:
-                if event.code == sf.Key.R:
+                if event.code == sf.Key.R or \
+                  (event.code == sf.Key.SPACE and not self.players[-1].alive):
                     self.start_again()
+                    continue
                 # Pass the key into the keyboard data handler.
                 self.keyboard.down(event.code)
                 
@@ -91,10 +101,6 @@ class GameManager(object):
 
             elif event.type == sf.Event.MOUSE_BUTTON_RELEASED:
                 self.mouse.up(event.button)
-                
-        self.keyboard.increment()
-        for vkb in self.virtual_keyboards:
-            vkb.increment()
                 
 ################################################################################
 

@@ -28,9 +28,7 @@ class VirtualKeyboard(object):
         self.keys_down[code].set(False)
         
     def increment(self):
-        if self.i >= len(self.history):
-            return
-        if self.history[self.i][0] == self.time:
+        while self.i < len(self.history) and self.history[self.i][0] == self.time:
             if self.history[self.i][2] == 'd':
                 self.down(self.history[self.i][1])
             elif self.history[self.i][2] == 'u':

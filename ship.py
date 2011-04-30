@@ -6,10 +6,10 @@ from math import sin, cos, radians
 class Ship(object):
     def __init__(self, keyboard, startLoc = sf.Vector2f(0, 0)):
         # Initialize inputs.
-        self.LEFT  = data_sink.DataSink(source = keyboard[sf.Key.A])
-        self.RIGHT = data_sink.DataSink(source = keyboard[sf.Key.D])
-        self.THRUST  = data_sink.DataSink(source = keyboard[sf.Key.W])
-        self.BRAKE  = data_sink.DataSink(source = keyboard[sf.Key.S])
+        self.LEFT  = data_sink.DataSink(source = keyboard[sf.Key.LEFT])
+        self.RIGHT = data_sink.DataSink(source = keyboard[sf.Key.RIGHT])
+        self.THRUST  = data_sink.DataSink(source = keyboard[sf.Key.UP])
+        self.BRAKE  = data_sink.DataSink(source = keyboard[sf.Key.DOWN])
         self.SHOOT  = data_sink.DataSink(source = keyboard[sf.Key.SPACE])
         
         # And initialize movement state.
@@ -28,10 +28,10 @@ class Ship(object):
 ################################################################################        
     def reset(self, keyboard, startLoc = sf.Vector2f(0, 0)):
         if keyboard:
-            self.LEFT  = data_sink.DataSink(source = keyboard[sf.Key.A])
-            self.RIGHT = data_sink.DataSink(source = keyboard[sf.Key.D])
-            self.THRUST  = data_sink.DataSink(source = keyboard[sf.Key.W])
-            self.BRAKE  = data_sink.DataSink(source = keyboard[sf.Key.S])
+            self.LEFT  = data_sink.DataSink(source = keyboard[sf.Key.LEFT])
+            self.RIGHT = data_sink.DataSink(source = keyboard[sf.Key.RIGHT])
+            self.THRUST  = data_sink.DataSink(source = keyboard[sf.Key.UP])
+            self.BRAKE  = data_sink.DataSink(source = keyboard[sf.Key.DOWN])
             self.SHOOT  = data_sink.DataSink(source = keyboard[sf.Key.SPACE])
         self.loc = startLoc
         self.momentum = sf.Vector2f()
@@ -102,13 +102,13 @@ class Ship(object):
     
         shipshape = sf.Shape()
         if self.is_clone:
-            alpha = 100
+            dark = 0.3
         else:
-            alpha = 255
+            dark = 1
         if self.alive:
-            color = sf.Color(255, 255, 255, alpha)
+            color = sf.Color(255 * dark, 255 * dark, 255 * dark)
         else:
-            color = sf.Color(255, 0, 0, alpha)
+            color = sf.Color(255 * dark, 0, 0)
         for c in self.corners:
             shipshape.add_point(c.x, c.y, sf.Color.BLACK, color)
         shipshape.outline_thickness = 1

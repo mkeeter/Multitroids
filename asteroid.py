@@ -1,16 +1,32 @@
 import sf
-from random import randint
+import random
 
 class Asteroid(object):
-    def __init__(self, mgr = None, loc = None, size = 25):
+    def __init__(self, mgr = None, loc = None, size = 25,
+                 clear_zone = None, seed = 1):
+                 
+        self.rand = random.Random()
+        self.rand.seed(seed)
+        
         if mgr:
             if loc:
                 self.loc = loc.copy()
             else:
-                self.loc = sf.Vector2f(randint(0, mgr.view_size.x),
-                                       randint(0, mgr.view_size.y))
+                self.loc = sf.Vector2f(self.rand.randint(0, mgr.view_size.x),
+                                       self.rand.randint(0, mgr.view_size.y))
+                self.size = size * 4
+                # Look for a starting spot far away from the clear zone (which
+                # is where the ship starts).
+                while clear_zone:
+                    if self.touches(clear_zone):
+                        self.loc = sf.Vector2f(
+                                    self.rand.randint(0, mgr.view_size.x),
+                                    self.rand.randint(0, mgr.view_size.y))
+                    else:
+                        clear_zone = None
 
-            self.momentum = sf.Vector2f(randint(-2, 2), randint(-2, 2))
+            self.momentum = sf.Vector2f(self.rand.randint(-2, 2),
+                                        self.rand.randint(-2, 2))
         else:
             self.loc = sf.Vector2f()
             self.momentum = sf.Vector2f()
@@ -25,9 +41,10 @@ class Asteroid(object):
             return []
 
         if not self.alive:
-            if self.size < 5:
+            if self.size < 10:
                 return []
-            return [Asteroid(mgr, self.loc, self.size / 1.5) for i in range(5)]
+            return [Asteroid(mgr, loc = self.loc, size = self.size / 1.5,
+                             seed = self.rand.random()) for i in range(3)]
             
         # Bound location within window.            
         if self.loc.x > mgr.view_size.x:
