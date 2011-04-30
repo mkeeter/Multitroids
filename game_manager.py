@@ -35,7 +35,7 @@ class GameManager(object):
                           for i in range(self.num_asteroids)]
         
         self.DEBUG = Toggle(source = self.keyboard[sf.Key.NUM0],
-                            initVal = True)
+                            initVal = False)
 
         self.won = False
 
@@ -88,9 +88,7 @@ class GameManager(object):
                   (event.code == sf.Key.SPACE and not self.players[-1].alive):
                     self.start_again()
                     continue
-                if self.players[-1].alive or event.code == sf.Key.ESCAPE:
-                    # Pass the key into the keyboard data handler.
-                    self.keyboard.down(event.code)
+                self.keyboard.down(event.code)
                 
             elif event.type == sf.Event.KEY_RELEASED:
                 if self.players[-1].alive:
@@ -125,6 +123,12 @@ class GameManager(object):
 ################################################################################
     
     def update(self):
+    
+        if (self.keyboard[sf.Key.L_SYSTEM] or self.keyboard[sf.Key.R_SYSTEM]) \
+            and self.keyboard[sf.Key.Q]:
+            self.running = False
+            return
+    
         for player in self.players:
             bullet = player.update(self)
             if bullet:
