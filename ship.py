@@ -21,7 +21,7 @@ class Ship(object):
                         sf.Vector2f(5, -5),
                         sf.Vector2f(0, 10)]
         # Plus various other state things
-        self.shootHeld = False
+        self.shootHeld = 0
         self.alive = True
         self.is_clone = False
         
@@ -81,11 +81,11 @@ class Ship(object):
         self.loc += self.momentum
         self.boundLoc(mgr)
         
-        if self.SHOOT and not self.shootHeld:
-            self.shootHeld = True
+        if self.SHOOT and self.shootHeld == 0:
+            self.shootHeld = 10
             return bullet.Bullet(self.loc.copy(), self.angle)
-        elif not self.SHOOT:
-            self.shootHeld = False
+        elif self.shootHeld > 0:
+            self.shootHeld -= 1
 ################################################################################        
     def draw(self, window):
         if self.THRUST and self.alive:

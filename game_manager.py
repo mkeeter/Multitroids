@@ -35,7 +35,7 @@ class GameManager(object):
                           for i in range(self.num_asteroids)]
         
         self.DEBUG = Toggle(source = self.keyboard[sf.Key.NUM0],
-                            initVal = False)
+                            initVal = True)
 
         self.won = False
 
@@ -48,6 +48,7 @@ class GameManager(object):
 
     def start_again(self):
         # Save a new virtual keyboard.
+        self.keyboard.history += [(self.keyboard.history[-1][0], sf.Key.SPACE, 'u')]
         self.virtual_keyboards += [VirtualKeyboard(self.keyboard)]
         
         # Switch over the last bot to running on the virtual keyboard.
@@ -87,11 +88,13 @@ class GameManager(object):
                   (event.code == sf.Key.SPACE and not self.players[-1].alive):
                     self.start_again()
                     continue
-                # Pass the key into the keyboard data handler.
-                self.keyboard.down(event.code)
+                if self.players[-1].alive or event.code == sf.Key.ESCAPE:
+                    # Pass the key into the keyboard data handler.
+                    self.keyboard.down(event.code)
                 
             elif event.type == sf.Event.KEY_RELEASED:
-                self.keyboard.up(event.code)  
+                if self.players[-1].alive:
+                    self.keyboard.up(event.code)  
 
             elif event.type == sf.Event.MOUSE_MOVED:
                 self.mouse.moved(event.x, event.y)

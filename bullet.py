@@ -11,27 +11,26 @@ class Bullet(object):
         self.alive = True
         
     def update(self, mgr = None):
-        self.loc += self.momentum
-        # Bound location within window.
-        if not mgr:
-            return
-            
-        if self.loc.x > mgr.view_size.x:
-            self.loc.x -= mgr.view_size.x
-        if self.loc.x < 0:
-            self.loc.x += mgr.view_size.x
-        if self.loc.y > mgr.view_size.y:
-            self.loc.y -= mgr.view_size.y
-        if self.loc.y < 0:
-            self.loc.y += mgr.view_size.y
+        for i in range(4):
+            self.loc += self.momentum / 4
+            # Bound location within window.
+            if mgr:
+                if self.loc.x > mgr.view_size.x:
+                    self.loc.x -= mgr.view_size.x
+                if self.loc.x < 0:
+                    self.loc.x += mgr.view_size.x
+                if self.loc.y > mgr.view_size.y:
+                    self.loc.y -= mgr.view_size.y
+                if self.loc.y < 0:
+                    self.loc.y += mgr.view_size.y
+                
+            for asteroid in mgr.asteroids:
+                if asteroid.touches(self.loc):
+                    asteroid.alive = False
+                    self.alive = False
         self.life -= 1
         if self.life <= 0:
             self.alive = False
-            
-        for asteroid in mgr.asteroids:
-            if asteroid.touches(self.loc):
-                asteroid.alive = False
-                self.alive = False
             
     def draw(self, window):
         line = sf.Shape.line(0, -5, 0, 5, 1, sf.Color.GREEN)
