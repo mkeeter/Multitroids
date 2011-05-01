@@ -13,6 +13,7 @@ class Keyboard(object):
             kVal = eval("sf.Key."+k)
             if type(kVal) == int:
                 self.keys_down[kVal] = data_source.DataSource()
+        self.recording = True
 
     def __getitem__(self, c):
         return self.keys_down[c]
@@ -24,14 +25,16 @@ class Keyboard(object):
         # Set keys_down to be true for this character.  
         if not(self.keys_down[code]):
             self.keys_down[code].set(True)
-        self.history += [(self.time, code, 'd')]
+        if self.recording:
+            self.history += [(self.time, code, 'd')]
 
     def up(self, code):
         """Record a key release."""
         if not(code in self.keys_down.keys()):
             return
         self.keys_down[code].set(False)
-        self.history += [(self.time, code, 'u')]
+        if self.recording:
+            self.history += [(self.time, code, 'u')]
 
     def increment(self):
         self.time += 1
@@ -41,3 +44,4 @@ class Keyboard(object):
         self.history = []
         for k in self.keys_down.keys():
             self.keys_down[k].set(False)
+        self.recording = True

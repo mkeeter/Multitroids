@@ -40,8 +40,7 @@ class GameManager(object):
         self.won = False
 
         # Start the system running
-        self.running = Toggle(initVal = True,\
-                              source = self.keyboard[sf.Key.ESCAPE])
+        self.running = True
             
 
 ################################################################################
@@ -67,6 +66,7 @@ class GameManager(object):
             player.reset(None, self.view_size / 2.0)
         self.players[-1].is_clone = False
 
+        self.bullets = []
         random.setstate(self.rand_state)
         self.asteroids = [Asteroid(self, clear_zone = self.view_size / 2.0,
                                    seed = random.random())
@@ -142,6 +142,9 @@ class GameManager(object):
             newAsteroids += asteroid.update(self)
         self.asteroids = filter(lambda x: x.alive, self.asteroids)
         self.asteroids += newAsteroids
+        
+        if not self.players[-1].alive and self.keyboard.recording:
+            self.keyboard.recording = False
 
 ################################################################################
     
