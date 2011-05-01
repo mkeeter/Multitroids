@@ -38,7 +38,7 @@ class GameManager(object):
         self.players = [Ship(self.keyboard, self.view_size / 2.0)]
         self.bullets = []
         self.rand_state = random.getstate()
-        self.num_asteroids = 5
+        self.num_asteroids = 1
         self.asteroids = [Asteroid(self, clear_zone = self.view_size / 2.0,
                                    seed = random.random())
                           for i in range(self.num_asteroids)]
