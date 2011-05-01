@@ -78,8 +78,8 @@ class Asteroid(object):
             
         return []
 
-    def draw(self, window):
-        self.shape.position = self.loc
+    def draw(self, window, offset = sf.Vector2f(0, 0)):
+        self.shape.position = self.loc + offset
         window.draw(self.shape)
         
     def touches(self, loc):

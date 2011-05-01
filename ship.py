@@ -90,8 +90,8 @@ class Ship(object):
     def draw(self, window):
         if self.THRUST and self.alive:
             thrustshape = sf.Shape()
-            thrustshape.add_point(-3, -5, sf.Color.BLACK, sf.Color.RED)
-            thrustshape.add_point(3, -5, sf.Color.BLACK, sf.Color.RED)
+            thrustshape.add_point(-3, -6, sf.Color.BLACK, sf.Color.RED)
+            thrustshape.add_point(3, -6, sf.Color.BLACK, sf.Color.RED)
             thrustshape.add_point(0, -10, sf.Color.BLACK, sf.Color.RED)
             thrustshape.outline_thickness = 1
             thrustshape.outline_enabled = True

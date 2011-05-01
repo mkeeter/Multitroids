@@ -13,13 +13,22 @@ class GameManager(object):
     def __init__(self):
         """Initialize the render window and set the game as running"""
 
+        FULLSCREEN = True
+
         # Initialize the window
-        self.window = sf.RenderWindow(sf.VideoMode(1440, 900),\
-                                      "Swarm", sf.Style.FULLSCREEN)
+        if FULLSCREEN:
+            self.window = sf.RenderWindow(sf.VideoMode(1440, 900),\
+                                          "Swarm", sf.Style.FULLSCREEN)
+        else:
+            self.window = sf.RenderWindow(sf.VideoMode(800, 500),\
+                                          "Swarm")
+        
         self.window.framerate_limit = 60
         self.view_size = sf.Vector2f(800, 500)
         self.window.view = sf.View.from_center_and_size(sf.Vector2f(),
-                                                        self.view_size)        
+                                                        self.view_size)
+        self.window.show_mouse_cursor = False
+                
         # Initialize real and virtual keyboards.
         self.keyboard = Keyboard()
         self.virtual_keyboards = []
@@ -71,6 +80,31 @@ class GameManager(object):
         self.asteroids = [Asteroid(self, clear_zone = self.view_size / 2.0,
                                    seed = random.random())
                           for i in range(self.num_asteroids)]
+
+################################################################################
+                          
+    def full_restart(self):
+        # Initialize real and virtual keyboards.
+        self.keyboard = Keyboard()
+        self.virtual_keyboards = []
+        self.mouse = Mouse()
+        
+        # Initialize game objects
+        self.players = [Ship(self.keyboard, self.view_size / 2.0)]
+        self.bullets = []
+        self.rand_state = random.getstate()
+        self.num_asteroids = 5
+        self.asteroids = [Asteroid(self, clear_zone = self.view_size / 2.0,
+                                   seed = random.random())
+                          for i in range(self.num_asteroids)]
+        
+        self.DEBUG = Toggle(source = self.keyboard[sf.Key.NUM0],
+                            initVal = False)
+
+        self.won = False
+
+        # Start the system running
+        self.running = True
         
 ################################################################################
 
@@ -117,7 +151,8 @@ class GameManager(object):
         while self.running:
             self.handle_input()
             self.update()
-            self.draw()
+            if self.running:
+                self.draw()
         self.shutdown()
 
 ################################################################################
@@ -163,8 +198,17 @@ class GameManager(object):
         else:
             text = sf.Text("FPS:inf")
         text.scale = sf.Vector2f(0.5, 0.5)
+        text.position = sf.Vector2f(0, self.view_size.y - 20)
         self.window.draw(text)
 
+################################################################################
+
+    def draw_HUD(self):
+        text = sf.Text("Ships: %d" % len(self.players))
+        text.position = sf.Vector2f(5, 5)
+        text.scale = sf.Vector2f(0.5, 0.5)
+        self.window.draw(text)
+        
 ################################################################################
     
     def draw(self):
@@ -172,15 +216,20 @@ class GameManager(object):
         
         self.window.view = sf.View.from_center_and_size(self.view_size / 2.,
                                                         self.view_size)        
-
         if self.DEBUG:
             self.draw_FPS()
 
         for player in self.players:        
             player.draw(self.window)
         [bullet.draw(self.window) for bullet in self.bullets]
-        [asteroid.draw(self.window) for asteroid in self.asteroids]        
         
+        for offset in [sf.Vector2f(0, 0), sf.Vector2f(self.view_size.x, 0),
+                       sf.Vector2f(-self.view_size.x, 0),
+                       sf.Vector2f(0, self.view_size.y),
+                       sf.Vector2f(0, -self.view_size.y)]:
+            [asteroid.draw(self.window, offset) for asteroid in self.asteroids]        
+        
+        self.draw_HUD()
         self.window.display()
 
 ################################################################################
