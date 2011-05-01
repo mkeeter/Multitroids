@@ -1,6 +1,6 @@
 import sf
 import random
-from math import sqrt
+from math import sqrt, cos, sin, pi
 
 class Asteroid(object):
     def __init__(self, mgr = None, loc = None, size = 25,
@@ -26,13 +26,32 @@ class Asteroid(object):
                     else:
                         clear_zone = None
 
-            self.momentum = sf.Vector2f(self.rand.randint(-2, 2),
-                                        self.rand.randint(-2, 2))
+            self.momentum = sf.Vector2f(self.rand.randint(-10, 10) / 5.,
+                                        self.rand.randint(-10, 10) / 5.)
         else:
             self.loc = sf.Vector2f()
             self.momentum = sf.Vector2f()
         self.alive = True
         self.size = size
+        self.shape = sf.Shape()
+        
+        # Make irregular shape
+        numPoints = 20
+        for i in range(0, numPoints):
+            angle = i/float(numPoints) * 2 * pi
+            if self.rand.random() < 0.2:
+                scale = 0
+                while scale < 0.5:
+                    scale = self.rand.random()
+            else:
+                scale = 1
+            self.shape.add_point(cos(angle) * self.size * scale,
+                                 sin(angle) * self.size * scale,
+                                 sf.Color.BLACK, sf.Color.WHITE)
+        self.shape.outline_thickness = 1
+        self.shape.outline_enabled = True
+        self.shape.fill_enabled = False
+            
     
             
     def update(self, mgr = None):
@@ -60,15 +79,8 @@ class Asteroid(object):
         return []
 
     def draw(self, window):
-        if self.alive:
-            color = sf.Color.WHITE
-        else:
-            color = sf.Color.BLACK
-            
-        circ = sf.Shape.circle(self.loc.x, self.loc.y, self.size,
-                               sf.Color.BLACK, 1, color)
-        circ.fill_enabled = False
-        window.draw(circ)
+        self.shape.position = self.loc
+        window.draw(self.shape)
         
     def touches(self, loc):
         if loc.x > (self.loc.x - self.size) and\
