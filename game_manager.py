@@ -170,6 +170,7 @@ class GameManager(object):
         if self.state == 'game':
             if len(self.asteroids) == 0:
                 self.state = 'win'
+                self.keyboard.up(sf.Key.SPACE)
                 return
         else:
             if self.state == 'start' and self.keyboard[sf.Key.SPACE]:
@@ -178,6 +179,7 @@ class GameManager(object):
             elif self.state == 'win' and self.keyboard[sf.Key.SPACE]:
                 self.state = 'start'
                 self.keyboard.up(sf.Key.SPACE)
+                print self.keyboard[sf.Key.SPACE].val
             return
                 
     
@@ -202,7 +204,6 @@ class GameManager(object):
     
     def shutdown(self):
         """The program is about to end.  Clean up and close the window."""
-        # Close the window.
         self.window.close()
 
 ################################################################################
