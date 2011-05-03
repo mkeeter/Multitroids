@@ -22,10 +22,10 @@ class GameManager(object):
         # Initialize the window
         if FULLSCREEN:
             self.window = sf.RenderWindow(sf.VideoMode(1440, 900),\
-                                          "Swarm", sf.Style.FULLSCREEN)
+                                          "Multitroids", sf.Style.FULLSCREEN)
         else:
             self.window = sf.RenderWindow(sf.VideoMode(720, 450),\
-                                          "Swarm")
+                                          "Multitroids")
         
         self.window.framerate_limit = 60
         self.window.view = sf.View.from_center_and_size(sf.Vector2f(),
@@ -169,14 +169,16 @@ class GameManager(object):
     
         if self.state == 'game':
             if len(self.asteroids) == 0:
-                print "You WIN!"
-                self.running = False
+                self.state = 'win'
+                return
         else:
-            if self.keyboard[sf.Key.SPACE]:
+            if self.state == 'start' and self.keyboard[sf.Key.SPACE]:
                 self.state = 'game'
                 self.full_restart()
-            else:
-                return
+            elif self.state == 'win' and self.keyboard[sf.Key.SPACE]:
+                self.state = 'start'
+                self.keyboard.up(sf.Key.SPACE)
+            return
                 
     
         for player in self.players:
@@ -236,11 +238,52 @@ class GameManager(object):
             self.draw_FPS()
 
         if self.state == 'start':
-            text = sf.Text("Multitroids", self.FONT, 100)
+            text = sf.Text("Multitroids", self.FONT, 200)
+            text.scale = sf.Vector2f(0.5, 0.5)
+            text.position = sf.Vector2f(self.view_size.x / 2.0 -
+                                        text.rect.width / 2.0,
+                                        self.view_size.y / 2.0 -
+                                        text.rect.height - 30)
+            self.window.draw(text)
+            text = sf.Text("Arrow keys to fly\nSpacebar to shoot and restart"+
+                           "\n\n    Press spacebar to begin",
+                           self.FONT, 60)
+            text.scale = sf.Vector2f(0.5, 0.5)
+            text.position = sf.Vector2f(self.view_size.x / 2.0 -
+                                        text.rect.width / 2.0,
+                                        self.view_size.y / 2.0 +
+                                        text.rect.height / 2.0 - 30)
+            self.window.draw(text)
+            text = sf.Text("www.mattkeeter.com",
+                           self.FONT, 30)
+            text.scale = sf.Vector2f(0.5, 0.5)
+            text.position = sf.Vector2f(15,
+                                        self.view_size.y -
+                                        text.rect.height * 1.5)
+            self.window.draw(text)
+            self.window.display()
+            return
+        elif self.state == 'win':
+            text = sf.Text("YOU WIN", self.FONT, 160)
+            text.scale = sf.Vector2f(0.5, 0.5)
             text.position = sf.Vector2f(self.view_size.x / 2.0 -
                                         text.rect.width / 2.0,
                                         self.view_size.y / 2.0 -
                                         text.rect.height)
+            self.window.draw(text)
+            text = sf.Text("Ships: %d" % len(self.players), self.FONT, 60)
+            text.scale = sf.Vector2f(0.5, 0.5)
+            text.position = sf.Vector2f(self.view_size.x / 2.0 -
+                                        text.rect.width / 2.0,
+                                        self.view_size.y / 2.0 +
+                                        text.rect.height / 2.0)
+            self.window.draw(text)
+            text = sf.Text("Press spacebar to restart", self.FONT, 40)
+            text.scale = sf.Vector2f(0.5, 0.5)
+            text.position = sf.Vector2f(self.view_size.x / 2.0 -
+                                        text.rect.width / 2.0,
+                                        self.view_size.y / 2.0 +
+                                        text.rect.height * 2.5)
             self.window.draw(text)
             self.window.display()
             return
