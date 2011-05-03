@@ -15,7 +15,7 @@ class Ship(object):
         # And initialize movement state.
         self.loc = startLoc
         self.momentum = sf.Vector2f()
-        self.angle = 0
+        self.angle = 180
         
         self.corners = [sf.Vector2f(-5, -5),
                         sf.Vector2f(5, -5),
@@ -35,7 +35,7 @@ class Ship(object):
             self.SHOOT  = data_sink.DataSink(source = keyboard[sf.Key.SPACE])
         self.loc = startLoc
         self.momentum = sf.Vector2f()
-        self.angle = 0
+        self.angle = 180
         self.shootHeld = False
         self.alive = True
         self.is_clone = True

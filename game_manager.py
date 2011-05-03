@@ -13,18 +13,21 @@ class GameManager(object):
     def __init__(self):
         """Initialize the render window and set the game as running"""
 
+        # Constants
         FULLSCREEN = True
-
+        self.FONT = sf.Font.load_from_file("Resources/raleway_thin.ttf")
+        self.num_asteroids = 3
+        self.view_size = sf.Vector2f(720, 450)
+        
         # Initialize the window
         if FULLSCREEN:
             self.window = sf.RenderWindow(sf.VideoMode(1440, 900),\
                                           "Swarm", sf.Style.FULLSCREEN)
         else:
-            self.window = sf.RenderWindow(sf.VideoMode(800, 500),\
+            self.window = sf.RenderWindow(sf.VideoMode(720, 450),\
                                           "Swarm")
         
         self.window.framerate_limit = 60
-        self.view_size = sf.Vector2f(800, 500)
         self.window.view = sf.View.from_center_and_size(sf.Vector2f(),
                                                         self.view_size)
         self.window.show_mouse_cursor = False
@@ -38,7 +41,6 @@ class GameManager(object):
         self.players = [Ship(self.keyboard, self.view_size / 2.0)]
         self.bullets = []
         self.rand_state = random.getstate()
-        self.num_asteroids = 1
         self.asteroids = [Asteroid(self, clear_zone = self.view_size / 2.0,
                                    seed = random.random())
                           for i in range(self.num_asteroids)]
@@ -50,6 +52,7 @@ class GameManager(object):
 
         # Start the system running
         self.running = True
+        self.state = 'start'
             
 
 ################################################################################
@@ -93,7 +96,7 @@ class GameManager(object):
         self.players = [Ship(self.keyboard, self.view_size / 2.0)]
         self.bullets = []
         self.rand_state = random.getstate()
-        self.num_asteroids = 5
+
         self.asteroids = [Asteroid(self, clear_zone = self.view_size / 2.0,
                                    seed = random.random())
                           for i in range(self.num_asteroids)]
@@ -159,10 +162,22 @@ class GameManager(object):
     
     def update(self):
     
-        if (self.keyboard[sf.Key.L_SYSTEM] or self.keyboard[sf.Key.R_SYSTEM]) \
-            and self.keyboard[sf.Key.Q]:
+        if ((self.keyboard[sf.Key.L_SYSTEM] or self.keyboard[sf.Key.R_SYSTEM]) \
+            and self.keyboard[sf.Key.Q]) or self.keyboard[sf.Key.ESCAPE]:
             self.running = False
             return
+    
+        if self.state == 'game':
+            if len(self.asteroids) == 0:
+                print "You WIN!"
+                self.running = False
+        else:
+            if self.keyboard[sf.Key.SPACE]:
+                self.state = 'game'
+                self.full_restart()
+            else:
+                return
+                
     
         for player in self.players:
             bullet = player.update(self)
@@ -204,8 +219,9 @@ class GameManager(object):
 ################################################################################
 
     def draw_HUD(self):
-        text = sf.Text("Ships: %d" % len(self.players))
-        text.position = sf.Vector2f(5, 5)
+        text = sf.Text("Ships: %d" % len(self.players), self.FONT, 30)
+        text.style = sf.Text.BOLD
+        text.position = sf.Vector2f(15, 15)
         text.scale = sf.Vector2f(0.5, 0.5)
         self.window.draw(text)
         
@@ -219,6 +235,16 @@ class GameManager(object):
         if self.DEBUG:
             self.draw_FPS()
 
+        if self.state == 'start':
+            text = sf.Text("Multitroids", self.FONT, 100)
+            text.position = sf.Vector2f(self.view_size.x / 2.0 -
+                                        text.rect.width / 2.0,
+                                        self.view_size.y / 2.0 -
+                                        text.rect.height)
+            self.window.draw(text)
+            self.window.display()
+            return
+            
         for player in self.players:        
             player.draw(self.window)
         [bullet.draw(self.window) for bullet in self.bullets]
