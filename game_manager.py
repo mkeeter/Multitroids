@@ -6,6 +6,7 @@ from ship import Ship
 from toggle import Toggle
 from asteroid import Asteroid
 import random
+from os import getcwd
 
 class GameManager(object):
     """The game manager class handles the entire game system."""
@@ -15,7 +16,7 @@ class GameManager(object):
 
         # Constants
         FULLSCREEN = True
-        self.FONT = sf.Font.load_from_file("Resources/raleway_thin.ttf")
+        self.FONT = sf.Font.load_from_file("raleway_thin.ttf")
         self.num_asteroids = 3
         self.view_size = sf.Vector2f(720, 450)
         
@@ -327,5 +328,6 @@ class GameManager(object):
 ################################################################################
 
 if __name__ == '__main__':
+    print "WOrking directory:",getcwd()
     mgr = GameManager()
     mgr.run()
