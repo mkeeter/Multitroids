@@ -61,7 +61,7 @@ class Asteroid(object):
             return []
 
         if not self.alive:
-            if self.size < 100:
+            if self.size < 10:
                 return []
             return [Asteroid(mgr, loc = self.loc, size = self.size / 1.5,
                              seed = self.rand.random()) for i in range(3)]
