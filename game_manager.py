@@ -11,23 +11,28 @@ from os import getcwd
 class GameManager(object):
     """The game manager class handles the entire game system."""
     
+    global RESOURCE_DIR
+    
     def __init__(self):
         """Initialize the render window and set the game as running"""
 
         # Constants
         FULLSCREEN = True
-        self.FONT = sf.Font.load_from_file("raleway_thin.ttf")
+        self.FONT = sf.Font.load_from_file(RESOURCE_DIR + "raleway_thin.ttf")
         self.num_asteroids = 3
         self.view_size = sf.Vector2f(720, 450)
-        
+ 
         # Initialize the window
         if FULLSCREEN:
-            self.window = sf.RenderWindow(sf.VideoMode(1440, 900),\
-                                          "Multitroids", sf.Style.FULLSCREEN)
+            self.window = sf.RenderWindow(sf.VideoMode(1440, 900), "Multitroids",
+                              sf.Style.FULLSCREEN,
+                              sf.ContextSettings(antialiasing = 32))
         else:
-            self.window = sf.RenderWindow(sf.VideoMode(720, 450),\
-                                          "Multitroids")
+            self.window = sf.RenderWindow(sf.VideoMode(720, 450), "Multitroids",
+                               sf.Style.DEFAULT,
+                               sf.ContextSettings(antialiasing = 32))
         
+
         self.window.framerate_limit = 60
         self.window.view = sf.View.from_center_and_size(sf.Vector2f(),
                                                         self.view_size)
@@ -180,7 +185,6 @@ class GameManager(object):
             elif self.state == 'win' and self.keyboard[sf.Key.SPACE]:
                 self.state = 'start'
                 self.keyboard.up(sf.Key.SPACE)
-                print self.keyboard[sf.Key.SPACE].val
             return
                 
     
@@ -225,8 +229,8 @@ class GameManager(object):
     def draw_HUD(self):
         text = sf.Text("Ships: %d" % len(self.players), self.FONT, 30)
         text.style = sf.Text.BOLD
-        text.position = sf.Vector2f(15, 15)
         text.scale = sf.Vector2f(0.5, 0.5)
+        text.position = sf.Vector2f(15, 15)
         self.window.draw(text)
         
 ################################################################################
@@ -327,7 +331,10 @@ class GameManager(object):
 
 ################################################################################
 
+RESOURCE_DIR = "./Resources/"
+
 if __name__ == '__main__':
-    print "WOrking directory:",getcwd()
+    if "Resources" in getcwd():
+        RESOURCE_DIR = "./"
     mgr = GameManager()
     mgr.run()
