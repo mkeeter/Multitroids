@@ -4,11 +4,11 @@ from math import sqrt, cos, sin, pi
 
 class Asteroid(object):
     def __init__(self, mgr = None, loc = None, size = 25,
-                 clear_zone = None, seed = 1):
+                 clear_zone = None, seed = 1, fragment = False):
                  
         self.rand = random.Random()
         self.rand.seed(seed)
-        
+        self.fragment = fragment
         if mgr:
             if loc:
                 self.loc = loc.copy()
@@ -33,6 +33,7 @@ class Asteroid(object):
             self.momentum = sf.Vector2f()
         self.alive = True
         self.size = size
+        self.drawSize = size
         self.shape = sf.Shape()
         
         # Make irregular shape
@@ -51,18 +52,26 @@ class Asteroid(object):
         self.shape.outline_thickness = 1
         self.shape.outline_enabled = True
         self.shape.fill_enabled = False
-            
-    
-            
+        self.rotation = self.rand.randint(0, 360)
+        self.dRot = self.rand.randint(-10, 10) / 10.0
+        
     def update(self, mgr = None):
         self.loc += self.momentum
-
+        self.rotation += self.dRot
+        
         if not mgr:
             return []
 
-        if not self.alive:
+        if self.fragment:
+            self.drawSize -= 0.2
+            if self.drawSize <= 0:
+                self.alive = False
+
+        if not self.alive and not self.fragment:
             if self.size < 10:
-                return []
+                return [Asteroid(mgr, loc = self.loc, size = self.size / 2.5,
+                                 seed = self.rand.random(), fragment = True)
+                        for i in range(10)]
             return [Asteroid(mgr, loc = self.loc, size = self.size / 1.5,
                              seed = self.rand.random()) for i in range(3)]
             
@@ -80,9 +89,15 @@ class Asteroid(object):
 
     def draw(self, window, offset = sf.Vector2f(0, 0)):
         self.shape.position = self.loc + offset
+        self.shape.rotation = self.rotation
+        self.shape.scale = sf.Vector2f(float(self.drawSize) / float(self.size),
+                                       float(self.drawSize) / float(self.size))
         window.draw(self.shape)
         
     def touches(self, loc):
+        if self.fragment:
+            return False
+            
         if loc.x > (self.loc.x - self.size) and\
            loc.x < (self.loc.x + self.size) and\
            loc.y > (self.loc.y - self.size) and\
