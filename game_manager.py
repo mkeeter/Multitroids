@@ -62,9 +62,9 @@ class GameManager(object):
         self.running = True
         self.state = 'start'
         
-        self.RECORDING = Toggle(source = self.keyboard[sf.Key.T],
-                                initVal = False)
-        self.frameNo = 0        
+#        self.RECORDING = Toggle(source = self.keyboard[sf.Key.T],
+#                                initVal = False)
+#        self.frameNo = 0        
             
 
 ################################################################################
@@ -115,8 +115,8 @@ class GameManager(object):
         
         self.DEBUG = Toggle(source = self.keyboard[sf.Key.NUM0],
                             initVal = False)
-        self.RECORDING = Toggle(source = self.keyboard[sf.Key.T],
-                                initVal = False)
+#        self.RECORDING = Toggle(source = self.keyboard[sf.Key.T],
+#                                initVal = False)
         self.won = False
 
         # Start the system running
@@ -132,9 +132,13 @@ class GameManager(object):
             # If the window is ever closed, stop running.
             if event.type == sf.Event.CLOSED:
                 self.running = False
+                return
 
             elif event.type == sf.Event.KEY_PRESSED:
-                if event.code == sf.Key.R or \
+                if event.code == sf.Key.ESCAPE:
+                    self.running = False
+                    return
+                elif event.code == sf.Key.R or \
                   (event.code == sf.Key.SPACE and not self.players[-1].alive):
                     self.start_again()
                     continue
@@ -168,18 +172,18 @@ class GameManager(object):
             self.update()
             if self.running:
                 self.draw()
-                if self.RECORDING:
-                    self.image.copy_screen(self.window)
-                    self.image.save_to_file("frames/"+str(self.frameNo) + ".png")
-                    self.frameNo += 1
+#                if self.RECORDING:
+#                    self.image.copy_screen(self.window)
+#                    self.image.save_to_file("frames/"+str(self.frameNo) + ".png")
+#                    self.frameNo += 1
         self.shutdown()
 
 ################################################################################
     
     def update(self):
     
-        if ((self.keyboard[sf.Key.L_SYSTEM] or self.keyboard[sf.Key.R_SYSTEM]) \
-            and self.keyboard[sf.Key.Q]) or self.keyboard[sf.Key.ESCAPE]:
+        if (self.keyboard[sf.Key.L_SYSTEM] or self.keyboard[sf.Key.R_SYSTEM]) \
+            and self.keyboard[sf.Key.Q]:
             self.running = False
             return
     
