@@ -73,7 +73,10 @@ class Asteroid(object):
                                  seed = self.rand.random(), fragment = True)
                         for i in range(10)]
             return [Asteroid(mgr, loc = self.loc, size = self.size / 1.5,
-                             seed = self.rand.random()) for i in range(3)]
+                             seed = self.rand.random()) for i in range(3)] +
+                    [Asteroid(mgr, loc = self.loc, size = self.size / 2.5,
+                             seed = self.rand.random(), fragment = True)
+                     for i in range(10)]
             
         # Bound location within window.            
         if self.loc.x > mgr.view_size.x:
