@@ -17,7 +17,7 @@ class GameManager(object):
         """Initialize the render window and set the game as running"""
 
         # Constants
-        FULLSCREEN = True
+        FULLSCREEN = False
         self.FONT = sf.Font.load_from_file(RESOURCE_DIR + "raleway_thin.ttf")
         self.num_asteroids = 3
         self.view_size = sf.Vector2f(720, 450)
@@ -27,10 +27,12 @@ class GameManager(object):
             self.window = sf.RenderWindow(sf.VideoMode(1440, 900), "Multitroids",
                               sf.Style.FULLSCREEN,
                               sf.ContextSettings(antialiasing = 32))
+            self.image = sf.Image(1440, 900)
         else:
             self.window = sf.RenderWindow(sf.VideoMode(720, 450), "Multitroids",
                                sf.Style.DEFAULT,
                                sf.ContextSettings(antialiasing = 32))
+            self.image = sf.Image(720, 450)
         
 
         self.window.framerate_limit = 60
@@ -59,6 +61,10 @@ class GameManager(object):
         # Start the system running
         self.running = True
         self.state = 'start'
+        
+        self.RECORDING = Toggle(source = self.keyboard[sf.Key.T],
+                                initVal = False)
+        self.frameNo = 0        
             
 
 ################################################################################
@@ -109,7 +115,8 @@ class GameManager(object):
         
         self.DEBUG = Toggle(source = self.keyboard[sf.Key.NUM0],
                             initVal = False)
-
+        self.RECORDING = Toggle(source = self.keyboard[sf.Key.T],
+                                initVal = False)
         self.won = False
 
         # Start the system running
@@ -134,8 +141,7 @@ class GameManager(object):
                 self.keyboard.down(event.code)
                 
             elif event.type == sf.Event.KEY_RELEASED:
-                if self.players[-1].alive:
-                    self.keyboard.up(event.code)  
+                self.keyboard.up(event.code)  
 
             elif event.type == sf.Event.MOUSE_MOVED:
                 self.mouse.moved(event.x, event.y)
@@ -162,6 +168,10 @@ class GameManager(object):
             self.update()
             if self.running:
                 self.draw()
+                if self.RECORDING:
+                    self.image.copy_screen(self.window)
+                    self.image.save_to_file("frames/"+str(self.frameNo) + ".png")
+                    self.frameNo += 1
         self.shutdown()
 
 ################################################################################
@@ -261,7 +271,7 @@ class GameManager(object):
                                         text.rect.height / 2.0 - 30)
             self.window.draw(text)
             text = sf.Text("www.mattkeeter.com",
-                           self.FONT, 30)
+                           self.FONT, 50)
             text.scale = sf.Vector2f(0.5, 0.5)
             text.position = sf.Vector2f(15,
                                         self.view_size.y -

@@ -11,10 +11,6 @@ class Toggle(object):
     def __nonzero__(self):
         return self.val
         
-    def detach(self):
-        """Cleanly detach a sink from a source."""
-        self.source.RemoveListener(self)
-        
     def set(self, clk):
         """May switch the toggle.  This should not be called manually."""
         if clk and not self.clk:

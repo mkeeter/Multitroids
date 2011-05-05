@@ -21,6 +21,7 @@ class Keyboard(object):
     def down(self, code):
         """Record a key press."""
         if not(code in self.keys_down.keys()):
+            print "Key not found (code",code,")"
             return
         # Set keys_down to be true for this character.  
         if not(self.keys_down[code]):
