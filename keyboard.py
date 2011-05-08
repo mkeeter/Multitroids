@@ -1,5 +1,5 @@
 import sf
-import data_source
+import data_logic
 
 class Keyboard(object):
     """The Keyboard class allows us to listen for key presses, then pass them
@@ -12,7 +12,7 @@ class Keyboard(object):
         for k in dir(sf.Key):
             kVal = eval("sf.Key."+k)
             if type(kVal) == int:
-                self.keys_down[kVal] = data_source.DataSource()
+                self.keys_down[kVal] = data_logic.DataBit()
         self.recording = True
 
     def __getitem__(self, c):

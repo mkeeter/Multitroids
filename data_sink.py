@@ -10,10 +10,6 @@ class DataSink(object):
     def __nonzero__(self):
         return self.val
         
-    def detach(self):
-        """Cleanly detach a sink from a source."""
-        self.source.remove_listener(self)
-        
     def set(self, val):
         """Set the value of the data sink.  This should not be called
         manually."""

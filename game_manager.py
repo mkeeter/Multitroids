@@ -1,9 +1,9 @@
 import sf
+import data_logic
 from keyboard import Keyboard
 from virtual_keyboard import VirtualKeyboard
 from mouse import Mouse
 from ship import Ship
-from toggle import Toggle
 from asteroid import Asteroid
 import random
 from os import getcwd
@@ -27,12 +27,12 @@ class GameManager(object):
             self.window = sf.RenderWindow(sf.VideoMode(1440, 900), "Multitroids",
                               sf.Style.FULLSCREEN,
                               sf.ContextSettings(antialiasing = 32))
-            self.image = sf.Image(1440, 900)
+#            self.image = sf.Image(1440, 900)
         else:
             self.window = sf.RenderWindow(sf.VideoMode(720, 450), "Multitroids",
                                sf.Style.DEFAULT,
                                sf.ContextSettings(antialiasing = 32))
-            self.image = sf.Image(720, 450)
+#            self.image = sf.Image(720, 450)
         
 
         self.window.framerate_limit = 60
@@ -53,8 +53,8 @@ class GameManager(object):
                                    seed = random.random())
                           for i in range(self.num_asteroids)]
         
-        self.DEBUG = Toggle(source = self.keyboard[sf.Key.NUM0],
-                            initVal = False)
+        self.DEBUG = data_logic.DataToggle(source = self.keyboard[sf.Key.NUM0],
+                                           initVal = False)
 
         self.won = False
 
@@ -113,8 +113,8 @@ class GameManager(object):
                                    seed = random.random())
                           for i in range(self.num_asteroids)]
         
-        self.DEBUG = Toggle(source = self.keyboard[sf.Key.NUM0],
-                            initVal = False)
+        self.DEBUG = data_logic.DataToggle(source = self.keyboard[sf.Key.NUM0],
+                                           initVal = False)
 #        self.RECORDING = Toggle(source = self.keyboard[sf.Key.T],
 #                                initVal = False)
         self.won = False

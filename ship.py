@@ -1,4 +1,4 @@
-import data_sink
+import data_logic
 import sf
 import bullet
 from math import sin, cos, radians
@@ -6,11 +6,11 @@ from math import sin, cos, radians
 class Ship(object):
     def __init__(self, keyboard, startLoc = sf.Vector2f(0, 0)):
         # Initialize inputs.
-        self.LEFT  = data_sink.DataSink(source = keyboard[sf.Key.LEFT])
-        self.RIGHT = data_sink.DataSink(source = keyboard[sf.Key.RIGHT])
-        self.THRUST  = data_sink.DataSink(source = keyboard[sf.Key.UP])
-        self.BRAKE  = data_sink.DataSink(source = keyboard[sf.Key.DOWN])
-        self.SHOOT  = data_sink.DataSink(source = keyboard[sf.Key.SPACE])
+        self.LEFT  = data_logic.DataBit(source = keyboard[sf.Key.LEFT])
+        self.RIGHT = data_logic.DataBit(source = keyboard[sf.Key.RIGHT])
+        self.THRUST  = data_logic.DataBit(source = keyboard[sf.Key.UP])
+        self.BRAKE  = data_logic.DataBit(source = keyboard[sf.Key.DOWN])
+        self.SHOOT  = data_logic.DataBit(source = keyboard[sf.Key.SPACE])
         
         # And initialize movement state.
         self.loc = startLoc
@@ -28,11 +28,11 @@ class Ship(object):
 ################################################################################        
     def reset(self, keyboard, startLoc = sf.Vector2f(0, 0)):
         if keyboard:
-            self.LEFT  = data_sink.DataSink(source = keyboard[sf.Key.LEFT])
-            self.RIGHT = data_sink.DataSink(source = keyboard[sf.Key.RIGHT])
-            self.THRUST  = data_sink.DataSink(source = keyboard[sf.Key.UP])
-            self.BRAKE  = data_sink.DataSink(source = keyboard[sf.Key.DOWN])
-            self.SHOOT  = data_sink.DataSink(source = keyboard[sf.Key.SPACE])
+            self.LEFT  = data_logic.DataBit(source = keyboard[sf.Key.LEFT])
+            self.RIGHT = data_logic.DataBit(source = keyboard[sf.Key.RIGHT])
+            self.THRUST  = data_logic.DataBit(source = keyboard[sf.Key.UP])
+            self.BRAKE  = data_logic.DataBit(source = keyboard[sf.Key.DOWN])
+            self.SHOOT  = data_logic.DataBit(source = keyboard[sf.Key.SPACE])
         self.loc = startLoc
         self.momentum = sf.Vector2f()
         self.angle = 180
