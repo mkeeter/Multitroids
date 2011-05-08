@@ -96,7 +96,7 @@ class GameManager(object):
                           for i in range(self.num_asteroids)]
         
         self.DEBUG = DataToggle(source = self.keyboard[sf.Key.NUM0],
-                                           initVal = False)
+                                initVal = False)
 #        self.RECORDING = Toggle(source = self.keyboard[sf.Key.T],
 #                                initVal = False)
         self.won = False
