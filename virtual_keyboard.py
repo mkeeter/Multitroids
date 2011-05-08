@@ -1,5 +1,5 @@
 import sf
-import data_source
+import data_logic
 
 class VirtualKeyboard(object):
     """This class allows you to play back a set of keystrokes, repeating a
@@ -13,7 +13,7 @@ class VirtualKeyboard(object):
         for k in dir(sf.Key):
             kVal = eval("sf.Key."+k)
             if type(kVal) == int:
-                self.keys_down[kVal] = data_source.DataSource()
+                self.keys_down[kVal] = data_logic.DataBit()
 
     def __getitem__(self, c):
         return self.keys_down[c]

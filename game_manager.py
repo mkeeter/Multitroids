@@ -1,5 +1,5 @@
 import sf
-import data_logic
+from data_logic import *
 from keyboard import Keyboard
 from virtual_keyboard import VirtualKeyboard
 from mouse import Mouse
@@ -39,27 +39,9 @@ class GameManager(object):
         self.window.view = sf.View.from_center_and_size(sf.Vector2f(),
                                                         self.view_size)
         self.window.show_mouse_cursor = False
+        
+        self.full_restart()
                 
-        # Initialize real and virtual keyboards.
-        self.keyboard = Keyboard()
-        self.virtual_keyboards = []
-        self.mouse = Mouse()
-        
-        # Initialize game objects
-        self.players = [Ship(self.keyboard, self.view_size / 2.0)]
-        self.bullets = []
-        self.rand_state = random.getstate()
-        self.asteroids = [Asteroid(self, clear_zone = self.view_size / 2.0,
-                                   seed = random.random())
-                          for i in range(self.num_asteroids)]
-        
-        self.DEBUG = data_logic.DataToggle(source = self.keyboard[sf.Key.NUM0],
-                                           initVal = False)
-
-        self.won = False
-
-        # Start the system running
-        self.running = True
         self.state = 'start'
         
 #        self.RECORDING = Toggle(source = self.keyboard[sf.Key.T],
@@ -113,14 +95,19 @@ class GameManager(object):
                                    seed = random.random())
                           for i in range(self.num_asteroids)]
         
-        self.DEBUG = data_logic.DataToggle(source = self.keyboard[sf.Key.NUM0],
+        self.DEBUG = DataToggle(source = self.keyboard[sf.Key.NUM0],
                                            initVal = False)
 #        self.RECORDING = Toggle(source = self.keyboard[sf.Key.T],
 #                                initVal = False)
         self.won = False
 
         # Start the system running
-        self.running = True
+        self.running = DataToggle(
+            source = DataOr(self.keyboard[sf.Key.ESCAPE],
+                            DataAnd(self.keyboard[sf.Key.Q], 
+                                    DataOr(self.keyboard[sf.Key.L_SYSTEM],
+                                           self.keyboard[sf.Key.R_SYSTEM]))),
+                                  initVal = True)
         
 ################################################################################
 
@@ -135,10 +122,7 @@ class GameManager(object):
                 return
 
             elif event.type == sf.Event.KEY_PRESSED:
-                if event.code == sf.Key.ESCAPE:
-                    self.running = False
-                    return
-                elif event.code == sf.Key.R or \
+                if event.code == sf.Key.R or \
                   (event.code == sf.Key.SPACE and not self.players[-1].alive):
                     self.start_again()
                     continue
@@ -181,11 +165,6 @@ class GameManager(object):
 ################################################################################
     
     def update(self):
-    
-        if (self.keyboard[sf.Key.L_SYSTEM] or self.keyboard[sf.Key.R_SYSTEM]) \
-            and self.keyboard[sf.Key.Q]:
-            self.running = False
-            return
     
         if self.state == 'game':
             if len(self.asteroids) == 0:
