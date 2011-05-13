@@ -6,11 +6,11 @@ from math import sin, cos, radians
 class Ship(object):
     def __init__(self, keyboard, startLoc = sf.Vector2f(0, 0)):
         # Initialize inputs.
-        self.LEFT  = data_logic.DataBit(source = keyboard[sf.Key.LEFT])
-        self.RIGHT = data_logic.DataBit(source = keyboard[sf.Key.RIGHT])
-        self.THRUST  = data_logic.DataBit(source = keyboard[sf.Key.UP])
-        self.BRAKE  = data_logic.DataBit(source = keyboard[sf.Key.DOWN])
-        self.SHOOT  = data_logic.DataBit(source = keyboard[sf.Key.SPACE])
+        self.LEFT  = keyboard[sf.Key.LEFT]
+        self.RIGHT = keyboard[sf.Key.RIGHT]
+        self.THRUST  = keyboard[sf.Key.UP]
+        self.BRAKE  = keyboard[sf.Key.DOWN]
+        self.SHOOT  = keyboard[sf.Key.SPACE]
         
         # And initialize movement state.
         self.loc = startLoc
@@ -21,18 +21,18 @@ class Ship(object):
                         sf.Vector2f(5, -5),
                         sf.Vector2f(0, 10)]
         # Plus various other state things
-        self.shootHeld = 0
+        self.shootHeld = False
         self.alive = True
         self.is_clone = False
         
 ################################################################################        
     def reset(self, keyboard, startLoc = sf.Vector2f(0, 0)):
         if keyboard:
-            self.LEFT  = data_logic.DataBit(source = keyboard[sf.Key.LEFT])
-            self.RIGHT = data_logic.DataBit(source = keyboard[sf.Key.RIGHT])
-            self.THRUST  = data_logic.DataBit(source = keyboard[sf.Key.UP])
-            self.BRAKE  = data_logic.DataBit(source = keyboard[sf.Key.DOWN])
-            self.SHOOT  = data_logic.DataBit(source = keyboard[sf.Key.SPACE])
+            self.LEFT  = keyboard[sf.Key.LEFT]
+            self.RIGHT = keyboard[sf.Key.RIGHT]
+            self.THRUST  = keyboard[sf.Key.UP]
+            self.BRAKE  = keyboard[sf.Key.DOWN]
+            self.SHOOT  = keyboard[sf.Key.SPACE]
         self.loc = startLoc
         self.momentum = sf.Vector2f()
         self.angle = 180

@@ -17,7 +17,7 @@ class GameManager(object):
         """Initialize the render window and set the game as running"""
 
         # Constants
-        FULLSCREEN = False
+        FULLSCREEN = True
         self.FONT = sf.Font.load_from_file(RESOURCE_DIR + "raleway_thin.ttf")
         self.num_asteroids = 3
         self.view_size = sf.Vector2f(720, 450)
