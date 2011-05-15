@@ -10,4 +10,4 @@ dmg: app
 	hdiutil create multitroids.dmg -srcfolder dist -volname multitroids
 
 clean:
-	rm -rf dist/* multitroids.app multitroids.dmg
+	rm -rf dist/multitroids.app multitroids.app multitroids.dmg

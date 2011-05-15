@@ -9,7 +9,7 @@ from setuptools import setup
 
 APP = ['game_manager.py']
 DATA_FILES = []
-OPTIONS = {'argv_emulation': False}
+OPTIONS = {}
 
 setup(
     app=APP,
