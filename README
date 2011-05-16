@@ -17,3 +17,5 @@ Acknowledgments:
   bindings, online at https://github.com/bastienleonard/pysfml2-cython
 - In-game font is Raleway Thin, from The League of Moveable Type;
   online at http://www.theleagueofmoveabletype.com/
+
+For license details, see the file "license" in the folder "dist"

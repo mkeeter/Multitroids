@@ -2,11 +2,12 @@ This program is copyright 2011 Matthew Keeter.  All rights reserved.
 
 Redistribution is permitted (and encouraged), provided that you
 don't remove the above copyright notice or misrepresent the origin
-of the software.
+of the software.  Unless you make an agreement with me, you are not
+allowed to charge others for this software in any form.
 
 By using this software, you are accepting all responsibility for
 damages it may cause to your computer, business, personal life,
-and/or pets.  Obviously, there's nothing malicious in the code,
+pets, et cetera.  Obviously, there's nothing malicious in the code,
 but if it somehow breaks your computer, dumps your girlfriend,
 and/or shaves your dog, don't sue me.
 
