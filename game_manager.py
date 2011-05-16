@@ -2,7 +2,6 @@ import sf
 from data_logic import *
 from keyboard import Keyboard
 from virtual_keyboard import VirtualKeyboard
-from mouse import Mouse
 from ship import Ship
 from asteroid import Asteroid
 import random
@@ -14,7 +13,7 @@ class GameManager(object):
     global RESOURCE_DIR
     
     def __init__(self):
-        """Initialize the render window and set the game as running"""
+        """Initialize the render window and start the game running"""
 
         # Constants
         FULLSCREEN = True
@@ -52,6 +51,9 @@ class GameManager(object):
 ################################################################################
 
     def start_again(self):
+        """Restart the game, preserving state.  Save a new virtual keyboard,
+           and add the most recent set of commands to the army of ghost ships.
+           """
         # Save a new virtual keyboard.
         self.keyboard.history += [(self.keyboard.time, sf.Key.SPACE, 'u')]
         self.virtual_keyboards += [VirtualKeyboard(self.keyboard)]
@@ -81,10 +83,10 @@ class GameManager(object):
 ################################################################################
                           
     def full_restart(self):
+        """Fully restart the game, clearing all history, etc."""
         # Initialize real and virtual keyboards.
         self.keyboard = Keyboard()
         self.virtual_keyboards = []
-        self.mouse = Mouse()
         
         # Initialize game objects
         self.players = [Ship(self.keyboard, self.view_size / 2.0)]
@@ -97,8 +99,10 @@ class GameManager(object):
         
         self.DEBUG = DataToggle(source = self.keyboard[sf.Key.NUM0],
                                 initVal = False)
+                                
 #        self.RECORDING = Toggle(source = self.keyboard[sf.Key.T],
 #                                initVal = False)
+
         self.won = False
 
         # Start the system running
@@ -120,7 +124,9 @@ class GameManager(object):
             if event.type == sf.Event.CLOSED:
                 self.running = False
                 return
-
+            
+            # Send key events to the keyboard, intercepting certain special
+            # cases (that restart the game)
             elif event.type == sf.Event.KEY_PRESSED:
                 if event.code == sf.Key.R or \
                   (event.code == sf.Key.SPACE and not self.players[-1].alive):
@@ -130,15 +136,6 @@ class GameManager(object):
                 
             elif event.type == sf.Event.KEY_RELEASED:
                 self.keyboard.up(event.code)  
-
-            elif event.type == sf.Event.MOUSE_MOVED:
-                self.mouse.moved(event.x, event.y)
-            
-            elif event.type == sf.Event.MOUSE_BUTTON_PRESSED:
-                self.mouse.down(event.button)
-
-            elif event.type == sf.Event.MOUSE_BUTTON_RELEASED:
-                self.mouse.up(event.button)
                 
         self.keyboard.increment()
         for vkb in self.virtual_keyboards:
@@ -165,7 +162,8 @@ class GameManager(object):
 ################################################################################
     
     def update(self):
-    
+        """Update the game's state."""
+        # Handle the menu screens
         if self.state == 'game':
             if len(self.asteroids) == 0:
                 self.state = 'win'
@@ -180,11 +178,13 @@ class GameManager(object):
                 self.keyboard.up(sf.Key.SPACE)
             return
                 
-    
+        # Update the player, adding any bullets to the master list.
         for player in self.players:
             bullet = player.update(self)
             if bullet:
                 self.bullets += [bullet]
+
+        # Update bullets and keep only those that are alive.
         [bullet.update(self) for bullet in self.bullets]
         self.bullets = filter(lambda x: x.alive, self.bullets)
         
@@ -195,6 +195,7 @@ class GameManager(object):
         self.asteroids = filter(lambda x: x.alive, self.asteroids)
         self.asteroids += newAsteroids
         
+        # When the player dies, stop recording keystrokes.
         if not self.players[-1].alive and self.keyboard.recording:
             self.keyboard.recording = False
 
@@ -220,6 +221,8 @@ class GameManager(object):
 ################################################################################
 
     def draw_HUD(self):
+        """Draw text in the upper left corner showing how many ships have
+           been used."""
         text = sf.Text("Ships: %d" % len(self.players), self.FONT, 30)
         text.style = sf.Text.BOLD
         text.scale = sf.Vector2f(0.5, 0.5)
@@ -229,6 +232,7 @@ class GameManager(object):
 ################################################################################
     
     def draw(self):
+        """Draw the entire game window."""
         self.window.clear()
         
         self.window.view = sf.View.from_center_and_size(self.view_size / 2.,
@@ -236,6 +240,7 @@ class GameManager(object):
         if self.DEBUG:
             self.draw_FPS()
 
+        # Draw the start screen.
         if self.state == 'start':
             text = sf.Text("Multitroids", self.FONT, 200)
             text.scale = sf.Vector2f(0.5, 0.5)
@@ -262,6 +267,7 @@ class GameManager(object):
             self.window.draw(text)
             self.window.display()
             return
+        # Draw the end screen.
         elif self.state == 'win':
             text = sf.Text("YOU WIN", self.FONT, 160)
             text.scale = sf.Vector2f(0.5, 0.5)
@@ -287,10 +293,12 @@ class GameManager(object):
             self.window.display()
             return
             
+        # Draw the rest of the game.
         for player in self.players:        
             player.draw(self.window)
         [bullet.draw(self.window) for bullet in self.bullets]
         
+        # Draw each asteroid at 8 positions, so that they wrap around cleanly.
         for offset in [sf.Vector2f(0, 0), sf.Vector2f(self.view_size.x, 0),
                        sf.Vector2f(-self.view_size.x, 0),
                        sf.Vector2f(0, self.view_size.y),
@@ -302,31 +310,11 @@ class GameManager(object):
 
 ################################################################################
 
-    def drawGrid(self):
-        center = self.window.view.center
-        size = self.window.view.size
-        
-        stepSize = 50
-        
-        startX = int(center[0] - size[0]) - int(center[0] - size[0]) % stepSize
-        endX =   int(center[0] + size[0]) - int(center[0] + size[0]) % stepSize
-        startY = int(center[1] - size[1]) - int(center[1] - size[1]) % stepSize
-        endY =   int(center[1] + size[1]) - int(center[1] + size[1]) % stepSize
-
-        color = sf.Color(120, 120, 120)
-        
-        for i in range(startX, endX, stepSize):
-            for j in range(startY, endY, stepSize):
-                circ = sf.Shape.circle(i, j, 2, color)
-                self.window.draw(circ)
-        circ = sf.Shape.circle(0, 0, 5, sf.Color.BLUE)
-        self.window.draw(circ)
-
-################################################################################
-
 RESOURCE_DIR = "./Resources/"
 
 if __name__ == '__main__':
+    # Figure out if this script is running from within a bundled application or
+    # from the command line.  This will determine the path to resources.
     if "Resources" in getcwd():
         RESOURCE_DIR = "./"
     mgr = GameManager()

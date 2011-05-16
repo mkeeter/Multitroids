@@ -8,11 +8,14 @@ class Mouse(object):
         self.buttons = [0, 0, 0]
         
     def moved(self, x, y):
+        """Call this function when the mouse moves."""
         self.xloc = x
         self.yloc = y
 
     def down(self, button):
+        """Call this function when a button is pressed."""
         self.buttons[button] = True
         
     def up(self, button):
+        """Call this function when a button is released."""
         self.buttons[button] = False

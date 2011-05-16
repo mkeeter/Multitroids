@@ -17,6 +17,7 @@ class Ship(object):
         self.momentum = sf.Vector2f()
         self.angle = 180
         
+        # Corners are used for drawing.
         self.corners = [sf.Vector2f(-5, -5),
                         sf.Vector2f(5, -5),
                         sf.Vector2f(0, 10)]
@@ -27,6 +28,8 @@ class Ship(object):
         
 ################################################################################        
     def reset(self, keyboard, startLoc = sf.Vector2f(0, 0)):
+        """Reset a ship to its original state, and re-attach it to a keyboard
+           (either real or virtual)"""
         if keyboard:
             self.LEFT  = keyboard[sf.Key.LEFT]
             self.RIGHT = keyboard[sf.Key.RIGHT]
@@ -42,7 +45,8 @@ class Ship(object):
 ################################################################################
 
     def boundLoc(self, mgr):
-        # Bound location within window.
+        """Limit the ship's location to within the window's viewing area, by
+           wrapping around the edges."""
         if mgr:
             if self.loc.x > mgr.view_size.x:
                 self.loc.x -= mgr.view_size.x
@@ -54,20 +58,28 @@ class Ship(object):
                 self.loc.y += mgr.view_size.y
 ################################################################################
     def update(self, mgr = None):
+        """Update the ship's status."""
+        
+        # If we're dead, then keep moving in the same direction, but don't do
+        # anything else.
         if not self.alive:
             self.loc += self.momentum
             self.boundLoc(mgr)
             return
             
+        # Check to see if we've hit any asteroid, using a circular collision
+        # detection radius for simplicity.
         for asteroid in mgr.asteroids:
             if not asteroid.fragment and asteroid.distance(self.loc) < 5:
                 self.alive = False
     
+        # Turn!
         if self.LEFT and not self.RIGHT:
             self.angle -= 5
         elif self.RIGHT and not self.LEFT:
             self.angle += 5
         
+        # Accelerate and decellerate!
         if self.THRUST:
             direction = sf.Vector2f(-sin(radians(self.angle)),
                                      cos(radians(self.angle)))
@@ -81,6 +93,7 @@ class Ship(object):
         self.loc += self.momentum
         self.boundLoc(mgr)
         
+        # Shoot!  If the key is held down, shoot once per 10 updates.
         if self.SHOOT and self.shootHeld == 0:
             self.shootHeld = 10
             return bullet.Bullet(self.loc.copy(), self.angle)
@@ -88,6 +101,9 @@ class Ship(object):
             self.shootHeld -= 1
 ################################################################################        
     def draw(self, window):
+        """Draws the ship in the provided window."""
+        
+        # Draw a red triangle of thrust behind the ship if we're accelerating.
         if self.THRUST and self.alive:
             thrustshape = sf.Shape()
             thrustshape.add_point(-3, -6, sf.Color.BLACK, sf.Color.RED)
@@ -100,7 +116,7 @@ class Ship(object):
             thrustshape.rotate(self.angle)
             window.draw(thrustshape)
     
-        shipshape = sf.Shape()
+        # Pick the ship's colors
         if self.is_clone:
             dark = 0.3
         else:
@@ -109,6 +125,9 @@ class Ship(object):
             color = sf.Color(255 * dark, 255 * dark, 255 * dark)
         else:
             color = sf.Color(255 * dark, 0, 0)
+        
+        # Draw the shape of the ship.    
+        shipshape = sf.Shape()
         for c in self.corners:
             shipshape.add_point(c.x, c.y, sf.Color.BLACK, color)
         shipshape.outline_thickness = 1

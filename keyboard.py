@@ -2,8 +2,7 @@ import sf
 import data_logic
 
 class Keyboard(object):
-    """The Keyboard class allows us to listen for key presses, then pass them
-    on to a set of listeners."""
+    """The Keyboard class records a set of key presses."""
     
     def __init__(self):
         self.keys_down = {}
@@ -19,28 +18,31 @@ class Keyboard(object):
         return self.keys_down[c]
 
     def down(self, code):
-        """Record a key press."""
+        """Call this when a key is pressed."""
+        
         if not(code in self.keys_down.keys()):
-            print "Key not found (code",code,")"
             return
-        # Set keys_down to be true for this character.  
-        if not(self.keys_down[code]):
-            self.keys_down[code].set(True)
+
+        self.keys_down[code].set(True)
         if self.recording:
             self.history += [(self.time, code, 'd')]
 
     def up(self, code):
-        """Record a key release."""
+        """Call this when a key is released."""
+        
         if not(code in self.keys_down.keys()):
             return
+
         self.keys_down[code].set(False)
         if self.recording:
             self.history += [(self.time, code, 'u')]
 
     def increment(self):
+        """Increment internal timer."""
         self.time += 1
         
     def reset(self):
+        """Reset to original state."""
         self.time = 0
         self.history = []
         for k in self.keys_down.keys():

@@ -11,8 +11,13 @@ class Bullet(object):
         self.alive = True
         
     def update(self, mgr = None):
+        """Update the bullet's position, checking to see if it hits any
+           asteroids"""
+           
+        # We move in 4 small jumps, to avoid glitching through a small asteroid.
         for i in range(4):
             self.loc += self.momentum / 4
+            
             # Bound location within window.
             if mgr:
                 if self.loc.x > mgr.view_size.x:
@@ -28,11 +33,14 @@ class Bullet(object):
                 if asteroid.touches(self.loc):
                     asteroid.alive = False
                     self.alive = False
+
+        # Bullets have a limited lifetime.
         self.life -= 1
         if self.life <= 0:
             self.alive = False
             
     def draw(self, window):
+        """Draw the bullet as a straight green line."""
         line = sf.Shape.line(0, -5, 0, 5, 1, sf.Color.GREEN)
         line.position = self.loc
         line.rotation = self.angle
