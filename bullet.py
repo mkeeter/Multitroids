@@ -41,7 +41,13 @@ class Bullet(object):
             
     def draw(self, window):
         """Draw the bullet as a straight green line."""
-        line = sf.Shape.line(0, -5, 0, 5, 1, sf.Color.GREEN)
+
+        if self.life < 5:
+            alpha = int(255 * float(self.life) / 5.0)
+        else:
+            alpha = 255
+        
+        line = sf.Shape.line(0, -5, 0, 5, 1, sf.Color(0, 255, 0, alpha))
         line.position = self.loc
         line.rotation = self.angle
         window.draw(line)
